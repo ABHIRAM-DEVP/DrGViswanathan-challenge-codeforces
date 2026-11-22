@@ -2,40 +2,36 @@ import java.io.*;
 import java.util.*;
 
 public class PlayinginaCasino{
-    static int luckiness(int x) {
-        int mn = 9, mx = 0;
-        while (x > 0) {
-            int d = x % 10;
-            if (d < mn) mn = d;
-            if (d > mx) mx = d;
-            x /= 10;
-        }
-        return mx - mn;
-    }
-
     public static void main(String[] args) throws Exception {
         FastScanner fs = new FastScanner(System.in);
-        StringBuilder out = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+
         int t = fs.nextInt();
         while (t-- > 0) {
-            int l = fs.nextInt();
-            int r = fs.nextInt();
+            int n = fs.nextInt();
+            int m = fs.nextInt();
 
-            int bestNum = l;
-            int bestLuck = -1;
-            int limit = Math.min(r, l + 105);
-
-            for (int x = l; x <= limit; x++) {
-                int luck = luckiness(x);
-                if (luck > bestLuck) {
-                    bestLuck = luck;
-                    bestNum = x;
-                    if (bestLuck == 9) break;
+            // Store column-wise so each column can be sorted independently
+            long[][] col = new long[m][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    col[j][i] = fs.nextLong();
                 }
             }
-            out.append(bestNum).append('\n');
+
+            long totalWinnings = 0L;
+            for (int j = 0; j < m; j++) {
+                Arrays.sort(col[j]);
+                for (int p = 0; p < n; p++) {
+                    long coeff = 2L * p - (n - 1);
+                    totalWinnings += coeff * col[j][p];
+                }
+            }
+
+            sb.append(totalWinnings).append('\n');
         }
-        System.out.print(out);
+
+        System.out.print(sb.toString());
     }
 
     static class FastScanner {
@@ -43,9 +39,11 @@ public class PlayinginaCasino{
         private final byte[] buffer = new byte[1 << 16];
         private int ptr = 0, len = 0;
 
-        FastScanner(InputStream is) { in = is; }
+        FastScanner(InputStream in) {
+            this.in = in;
+        }
 
-        private int read() throws IOException {
+        private int readByte() throws IOException {
             if (ptr >= len) {
                 len = in.read(buffer);
                 ptr = 0;
@@ -55,19 +53,26 @@ public class PlayinginaCasino{
         }
 
         int nextInt() throws IOException {
+            return (int) nextLong();
+        }
+
+        long nextLong() throws IOException {
             int c;
-            while ((c = read()) <= ' ') {
-                if (c == -1) return -1;
-            }
-            int sign = 1;
+            do {
+                c = readByte();
+                if (c == -1) return Long.MIN_VALUE;
+            } while (c <= ' ');
+
+            long sign = 1L;
             if (c == '-') {
-                sign = -1;
-                c = read();
+                sign = -1L;
+                c = readByte();
             }
-            int val = 0;
+
+            long val = 0L;
             while (c > ' ') {
-                val = val * 10 + (c - '0');
-                c = read();
+                val = val * 10L + (c - '0');
+                c = readByte();
             }
             return val * sign;
         }
