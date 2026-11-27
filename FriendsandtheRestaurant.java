@@ -56,10 +56,6 @@ public class FriendsandtheRestaurant{
                 }
             }
 
-            if (left == right && diff[right] >= 0) {
-                groups++;
-            }
-
             out.append(groups).append('\n');
         }
 
